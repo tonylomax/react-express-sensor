@@ -40,11 +40,11 @@ board.on("ready", () => {
 
     // setInterval(() => getApiAndEmit(socket), 3000);
 
-    mySensor.on("change", function(event) {
+    mySensor.on("change", function (event) {
       counter++;
       console.log(counter);
 
-      if (counter % 20 === 0) {
+      if (counter % 100 === 0) {
         const scaledData = this.scaleTo(0, 1000);
         const timeObj = { x: timeCounter++, y: scaledData };
         console.log(timeObj);
