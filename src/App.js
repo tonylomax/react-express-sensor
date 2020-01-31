@@ -10,7 +10,7 @@ export default function App() {
 
   React.useEffect(() => {
     socket.on("emg", data => {
-      // do stuff with  your data below
+      // do stuff with your data below
       setResponse(response => [...response, data.y]);
     });
     return () => {
