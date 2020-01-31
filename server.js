@@ -4,8 +4,8 @@ const axios = require("axios");
 const socketIo = require("socket.io");
 const index = require("./routes/index");
 const lodash = require("lodash");
-const app = express();
 
+const app = express();
 const server = http.createServer(app);
 const io = socketIo(server);
 const PORT = process.env.PORT || 4001;
@@ -28,7 +28,6 @@ const getApiAndEmit = async socket => {
   }
 };
 
-
 io.on("connection", socket => {
   console.log("New client connected");
   setInterval(() => getApiAndEmit(socket), 3000);
@@ -36,8 +35,5 @@ io.on("connection", socket => {
     console.log("Client disconnected");
   });
 });
-
-
-
 
 server.listen(PORT, () => console.log(`Listening on port ${PORT}`));
