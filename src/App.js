@@ -1,6 +1,6 @@
 import React from "react";
 import socketIOClient from "socket.io-client";
-import { Line } from "react-chartjs-2";
+import { Bar } from "react-chartjs-2";
 
 const ENDPOINT = "http://127.0.0.1:4001";
 const socket = socketIOClient(ENDPOINT);
@@ -11,7 +11,8 @@ export default function App() {
   React.useEffect(() => {
     socket.on("emg", data => {
       // do stuff with your data below
-      setResponse(response => [...response, data.y]);
+      console.log(data)
+      setResponse(data);
     });
     return () => {
       console.log("Component unmounted");
@@ -24,7 +25,7 @@ export default function App() {
       {
         label: "My First dataset",
         fill: false,
-        lineTension: 0.1,
+        lineTension: 1,
         backgroundColor: "rgba(75,192,192,0.4)",
         borderColor: "rgba(75,192,192,1)",
         borderCapStyle: "butt",
@@ -40,14 +41,27 @@ export default function App() {
         pointHoverBorderWidth: 2,
         pointRadius: 1,
         pointHitRadius: 10,
-        data: response
+        data: [{ x: "strength", y: response }],
+        options: {
+          animation: false,
+          scales: {
+            yAxes: [{
+              ticks: {
+                beginAtZero: true,
+                min: 0,
+                max: 1000
+              }
+            }]
+          }
+        }
+
       }
     ]
   };
 
   return (
     <div style={{ textAlign: "center" }}>
-      {response ? <Line data={data} /> : <p>Loading...</p>}
+      {response ? <Bar data={data} /> : <p>Loading...</p>}
     </div>
   );
 }
