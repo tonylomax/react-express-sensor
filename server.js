@@ -3,11 +3,11 @@ const express = require("express");
 const http = require("http");
 const socketIo = require("socket.io");
 const index = require("./routes/index");
-//const five = require("johnny-five");
+const five = require("johnny-five");
 const fetch = require("node-fetch");
 
 const port = process.env.PORT || 4001;
-//const board = new five.Board();
+const board = new five.Board();
 const app = express();
 const server = http.createServer(app);
 const io = socketIo(server);
@@ -48,14 +48,7 @@ const filePath = path.resolve(
   `./src/Logs/${currentUser}/${Date.now()}_${currentUser}.csv`
 );
 
-writer.pipe(fs.createWriteStream(filePath));
 
-const testArr = [1, 2, 3, 4, 5];
-
-testArr.forEach(num => {
-  writer.write({ time: Date.now(), value: num });
-});
-writer.end();
 
 // Imports the Google Cloud client library
 
@@ -66,7 +59,7 @@ writer.end();
 /**
  * TODO(developer): Uncomment these variables before running the sample.
  */
-const bucketName = "samson-bucket-zinc-t";
+const bucketName = "samson-bucket-zinc";
 
 const storage = new Storage();
 
@@ -87,34 +80,47 @@ async function uploadFile() {
 
   console.log(`${filePath} uploaded to ${bucketName}.`);
 }
-uploadFile().catch(console.error);
 
-// board.on("ready", () => {
-//   const mySensor = new five.Sensor("A0");
 
-//   io.on("connection", socket => {
+board.on("ready", () => {
+  const mySensor = new five.Sensor("A0");
 
-//     const currentFileName = `${Data.now()}`
-//     console.log("New client connected");
-//     mySensor.on("change", function (event) {
+  // io.on("connection", socket => {
 
-//       console.log("change,", this.scaleTo(0, 1000))
-//       counter++;
-//       if (counter % 10 === 0) {
-//         const scaledData = this.scaleTo(0, 1000);
-//         const timeObj = {
-//           x: timeCounter++,
-//           y: scaledData
-//         };
-//         socket.emit("emg", timeObj);
-//       }
-//     });
-//     socket.on("disconnect", () => {
+  // const currentFileName = `${Data.now()}`
+  console.log("New client connected");
+  writer.pipe(fs.createWriteStream(filePath));
 
-//       console.log("Client disconnected");
-//     }
-//     );
-//   });
-// })
+  mySensor.on("change", function (event) {
 
+    const scaledData = this.scaleTo(0, 1000);
+
+    writer.write({ time: Date.now(), value: scaledData });
+
+
+    console.log("change,", this.scaleTo(0, 1000))
+    counter++;
+    // if (counter % 10 === 0) {
+
+    //   const timeObj = {
+    //     x: timeCounter++,
+    //     y: scaledData
+    //   };
+    //   socket.emit("emg", timeObj);
+    // }
+  });
+
+
+  // socket.on("disconnect", () => {
+
+  // }
+  // );
+
+});
+
+setTimeout(() => {
+  // writer.end();
+  uploadFile().catch(console.error);
+  console.log("Client disconnected");
+}, 10000);
 server.listen(port, () => console.log(`Listening on port ${port}`));
